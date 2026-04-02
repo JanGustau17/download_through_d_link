@@ -38,6 +38,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 # ── Globals ─────────────────────────────────────────────────────────────────
 downloads = {}  # id -> {status, progress, speed, filename, ...}
 ws_clients = set()
+main_loop = None  # Set in main(), used by threads
 
 
 # ── Utility ─────────────────────────────────────────────────────────────────
@@ -129,26 +130,57 @@ def probe_url(url):
     if has_drm:
         return {"error": "restricted", "message": "This content is DRM-protected. Download is not possible."}
 
-    # Build resolution list
+    duration = info.get("duration") or 0
+
+    # Build resolution list — pick best format per height
     resolutions = {}
     for f in formats:
         h = f.get("height")
         if h and f.get("vcodec", "none") != "none":
             existing = resolutions.get(h)
-            if not existing or (f.get("filesize") or 0) > (existing.get("filesize") or 0):
+            # Prefer higher tbr (total bitrate) for better quality estimate
+            new_tbr = f.get("tbr") or 0
+            old_tbr = existing.get("tbr", 0) if existing else 0
+            if not existing or new_tbr > old_tbr:
                 resolutions[h] = f
 
     res_list = []
     labels = {144: "144p", 240: "240p", 360: "360p", 480: "480p (SD)", 720: "720p (HD)",
               1080: "1080p (Full HD)", 1440: "1440p (2K)", 2160: "2160p (4K)", 4320: "4320p (8K)"}
 
+    # Find best audio stream bitrate + size for combo estimates
+    best_audio_size = 0
+    best_audio_abr = 0
+    for f in formats:
+        if f.get("acodec", "none") != "none" and f.get("vcodec", "none") == "none":
+            asize = f.get("filesize") or f.get("filesize_approx") or 0
+            abr = f.get("abr") or f.get("tbr") or 0
+            if asize > best_audio_size:
+                best_audio_size = asize
+            if abr > best_audio_abr:
+                best_audio_abr = abr
+
+    # Estimate audio size from bitrate if no filesize available
+    if not best_audio_size and best_audio_abr and duration:
+        best_audio_size = int(best_audio_abr * 1000 / 8 * duration)
+
     for h in sorted(resolutions.keys()):
         f = resolutions[h]
-        size = f.get("filesize") or f.get("filesize_approx") or 0
+        vsize = f.get("filesize") or f.get("filesize_approx") or 0
+
+        # If no filesize, estimate from tbr (total bitrate) × duration
+        if not vsize and duration:
+            tbr = f.get("tbr") or 0
+            if tbr:
+                vsize = int(tbr * 1000 / 8 * duration)
+
+        # Total = video stream + audio stream
+        total = vsize + best_audio_size if vsize else 0
         res_list.append({
             "height": h,
             "label": labels.get(h, f"{h}p"),
-            "size": format_size(size) if size else "",
+            "size": format_size(total) if total else "",
+            "size_bytes": total,
             "format_id": f.get("format_id", ""),
         })
 
@@ -158,6 +190,11 @@ def probe_url(url):
         for f in formats
     )
 
+    # Get best video+audio total for "best quality" estimate
+    best_total = 0
+    if res_list:
+        best_total = res_list[-1].get("size_bytes", 0)
+
     return {
         "title": info.get("title", "Unknown"),
         "uploader": info.get("uploader", ""),
@@ -165,18 +202,20 @@ def probe_url(url):
         "thumbnail": info.get("thumbnail", ""),
         "resolutions": res_list,
         "has_audio": has_audio,
+        "best_audio_size": best_audio_size,
+        "best_total_size": best_total,
         "url": url,
         "type": "media",
     }
 
 
 # ── Download worker ─────────────────────────────────────────────────────────
-def download_worker(dl_id, url, mode, height, loop, audio_format="mp3", audio_quality="0"):
+def download_worker(dl_id, url, mode, height, loop=None, audio_format="mp3", audio_quality="0"):
     """Run download in a thread, push progress via WS."""
 
     def send(msg):
         msg["id"] = dl_id
-        asyncio.run_coroutine_threadsafe(broadcast(msg), loop)
+        asyncio.run_coroutine_threadsafe(broadcast(msg), main_loop)
 
     send({"status": "downloading", "progress": 0, "speed": ""})
 
@@ -217,12 +256,18 @@ def download_worker(dl_id, url, mode, height, loop, audio_format="mp3", audio_qu
         m = re.search(r"\[download\]\s+([\d.]+)%", line)
         if m:
             pct = float(m.group(1))
-            speed_m = re.search(r"at\s+([\d.]+\w+/s)", line)
+            speed_m = re.search(r"at\s+([\d.]+\s*\w+/s)", line)
             eta_m = re.search(r"ETA\s+(\S+)", line)
+            # Parse "of ~XXX" or "of XXX" for total size
+            size_m = re.search(r"of\s+~?\s*([\d.]+\s*\w+)", line)
+            # Parse downloaded so far "XXX at"
+            dl_m = re.search(r"([\d.]+\s*\w+)\s+at\s+", line)
             send({
                 "status": "downloading",
                 "progress": round(pct, 1),
                 "speed": speed_m.group(1) if speed_m else "",
+                "total_size": size_m.group(1) if size_m else "",
+                "downloaded": dl_m.group(1) if dl_m else "",
                 "eta": eta_m.group(1) if eta_m else "",
             })
 
@@ -243,12 +288,12 @@ def download_worker(dl_id, url, mode, height, loop, audio_format="mp3", audio_qu
         send({"status": "error", "message": "Download failed. Check the URL."})
 
 
-def download_direct_worker(dl_id, url, loop):
+def download_direct_worker(dl_id, url, loop=None):
     """Download a direct file link."""
 
     def send(msg):
         msg["id"] = dl_id
-        asyncio.run_coroutine_threadsafe(broadcast(msg), loop)
+        asyncio.run_coroutine_threadsafe(broadcast(msg), main_loop)
 
     filename = url.split("?")[0].split("#")[0].split("/")[-1] or "download"
     dest = os.path.join(DOWNLOAD_DIR, filename)
@@ -317,7 +362,7 @@ async def ws_handler(websocket):
                         result = probe_url(url)
                     asyncio.run_coroutine_threadsafe(
                         websocket.send(json.dumps({"action": "probe_result", **result})),
-                        loop,
+                        main_loop,
                     )
 
                 threading.Thread(target=do_probe, daemon=True).start()
@@ -329,6 +374,8 @@ async def ws_handler(websocket):
                 dl_type = msg.get("type", "media")
                 audio_format = msg.get("audio_format", "mp3")
                 audio_quality = msg.get("audio_quality", "best")
+                title = msg.get("title", "")
+                thumbnail = msg.get("thumbnail", "")
                 dl_id = str(uuid.uuid4())[:8]
 
                 if dl_type == "direct":
@@ -343,7 +390,21 @@ async def ws_handler(websocket):
                         daemon=True,
                     ).start()
 
-                await websocket.send(json.dumps({"action": "download_started", "id": dl_id}))
+                # Send back title/thumb so the queue item can display it
+                label = title or url.split("/")[-1]
+                quality_label = ""
+                if mode == "audio":
+                    quality_label = f"{audio_format.upper()}"
+                elif mode == "video" and height:
+                    quality_label = f"{height}p"
+                else:
+                    quality_label = "Best"
+
+                await websocket.send(json.dumps({
+                    "action": "download_started", "id": dl_id,
+                    "title": label, "thumbnail": thumbnail,
+                    "quality": quality_label,
+                }))
 
     except websockets.exceptions.ConnectionClosed:
         pass
@@ -367,6 +428,9 @@ def run_http():
 
 # ── Main ────────────────────────────────────────────────────────────────────
 async def main():
+    global main_loop
+    main_loop = asyncio.get_running_loop()
+
     # Start HTTP server in thread
     http_thread = threading.Thread(target=run_http, daemon=True)
     http_thread.start()

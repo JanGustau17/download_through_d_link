@@ -26,6 +26,7 @@
       --red-glow: rgba(252, 129, 129, 0.15);
       --yellow: #f6e05e;
       --orange: #f6ad55;
+      --purple: #b794f4;
       --radius: 16px;
       --radius-sm: 10px;
     }
@@ -39,40 +40,11 @@
     }
 
     /* ── Animated background ──────────────────────────────────────── */
-    .bg-glow {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-    .bg-glow .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(120px);
-      opacity: 0.15;
-      animation: float 20s ease-in-out infinite;
-    }
-    .bg-glow .orb:nth-child(1) {
-      width: 600px; height: 600px;
-      background: #4299e1;
-      top: -200px; left: -100px;
-      animation-delay: 0s;
-    }
-    .bg-glow .orb:nth-child(2) {
-      width: 500px; height: 500px;
-      background: #9f7aea;
-      bottom: -200px; right: -100px;
-      animation-delay: -7s;
-    }
-    .bg-glow .orb:nth-child(3) {
-      width: 400px; height: 400px;
-      background: #38b2ac;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      animation-delay: -14s;
-    }
-
+    .bg-glow { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .bg-glow .orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.15; animation: float 20s ease-in-out infinite; }
+    .bg-glow .orb:nth-child(1) { width: 600px; height: 600px; background: #4299e1; top: -200px; left: -100px; }
+    .bg-glow .orb:nth-child(2) { width: 500px; height: 500px; background: #9f7aea; bottom: -200px; right: -100px; animation-delay: -7s; }
+    .bg-glow .orb:nth-child(3) { width: 400px; height: 400px; background: #38b2ac; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -14s; }
     @keyframes float {
       0%, 100% { transform: translate(0, 0) scale(1); }
       25% { transform: translate(50px, -30px) scale(1.05); }
@@ -81,481 +53,191 @@
     }
 
     /* ── Layout ───────────────────────────────────────────────────── */
-    .app {
-      position: relative;
-      z-index: 1;
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 60px 20px 40px;
-    }
+    .app { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 60px 20px 40px; }
 
     /* ── Header ───────────────────────────────────────────────────── */
-    .header {
-      text-align: center;
-      margin-bottom: 48px;
-    }
+    .header { text-align: center; margin-bottom: 48px; }
     .header .logo {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, var(--accent), #b794f4);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-size: 2rem; font-weight: 700; letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
     .header .logo .bolt { font-size: 1.6rem; margin-right: 4px; }
-    .header .sub {
-      color: var(--text-dim);
-      font-size: 0.85rem;
-      margin-top: 6px;
-      letter-spacing: 0.5px;
-    }
+    .header .sub { color: var(--text-dim); font-size: 0.85rem; margin-top: 6px; letter-spacing: 0.5px; }
 
     /* ── Glass card ───────────────────────────────────────────────── */
     .card {
-      background: var(--surface);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 28px;
-      margin-bottom: 20px;
-      transition: border-color 0.3s;
+      background: var(--surface); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border); border-radius: var(--radius); padding: 28px;
+      margin-bottom: 20px; transition: border-color 0.3s;
     }
     .card:hover { border-color: rgba(255,255,255,0.12); }
     .card.active { border-color: var(--border-accent); }
 
     /* ── Input area ───────────────────────────────────────────────── */
-    .input-group {
-      display: flex;
-      gap: 10px;
-    }
+    .input-group { display: flex; gap: 10px; }
     .url-input {
-      flex: 1;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 14px 18px;
-      color: var(--text);
-      font-size: 0.95rem;
-      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-      outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
+      flex: 1; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 14px 18px; color: var(--text);
+      font-size: 0.95rem; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      outline: none; transition: border-color 0.3s, box-shadow 0.3s;
     }
     .url-input::placeholder { color: var(--text-muted); }
-    .url-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
+    .url-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
     .btn {
-      padding: 14px 24px;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
+      padding: 14px 24px; border: none; border-radius: var(--radius-sm);
+      font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap;
     }
     .btn-primary {
-      background: linear-gradient(135deg, #4299e1, #667eea);
-      color: white;
+      background: linear-gradient(135deg, #4299e1, #667eea); color: white;
       box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
     }
-    .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
-    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4); }
     .btn-primary:active { transform: translateY(0); }
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    /* ── Spinner ──────────────────────────────────────────────────── */
     .spinner {
-      display: inline-block;
-      width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,0.2);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
+      display: inline-block; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.2); border-top-color: white;
+      border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── Media info card ──────────────────────────────────────────── */
-    .media-info {
-      display: none;
-      animation: slideUp 0.4s ease;
-    }
+    .media-info { display: none; animation: slideUp 0.4s ease; }
     .media-info.show { display: block; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .media-header {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-    .media-thumb {
-      width: 140px;
-      height: 80px;
-      border-radius: 8px;
-      object-fit: cover;
-      background: var(--bg2);
-      flex-shrink: 0;
-    }
-    .media-meta h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .media-meta .meta-row {
-      color: var(--text-dim);
-      font-size: 0.8rem;
-      margin-top: 4px;
-    }
+    .media-header { display: flex; gap: 16px; margin-bottom: 20px; }
+    .media-thumb { width: 140px; height: 80px; border-radius: 8px; object-fit: cover; background: var(--bg2); flex-shrink: 0; }
+    .media-meta h3 { font-size: 1rem; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .media-meta .meta-row { color: var(--text-dim); font-size: 0.8rem; margin-top: 4px; }
 
     /* ── Resolution grid ──────────────────────────────────────────── */
-    .res-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
+    .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
     .res-option {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 12px 14px; cursor: pointer; transition: all 0.2s; display: flex;
+      justify-content: space-between; align-items: center;
     }
-    .res-option:hover {
-      background: var(--surface-hover);
-      border-color: rgba(255,255,255,0.15);
-    }
-    .res-option.selected {
-      border-color: var(--accent);
-      background: var(--accent-glow);
-      box-shadow: 0 0 0 1px var(--accent);
-    }
-    .res-option .res-label {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    .res-option .res-size {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-    .res-option .res-badge {
-      font-size: 0.65rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(246, 173, 85, 0.15);
-      color: var(--orange);
-      font-weight: 600;
-      margin-left: 8px;
-    }
+    .res-option:hover { background: var(--surface-hover); border-color: rgba(255,255,255,0.15); }
+    .res-option.selected { border-color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 0 1px var(--accent); }
+    .res-option .res-label { font-weight: 600; font-size: 0.9rem; }
+    .res-option .res-size { font-size: 0.75rem; color: var(--accent); font-weight: 500; }
+    .res-option .res-badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(246, 173, 85, 0.15); color: var(--orange); font-weight: 600; margin-left: 8px; }
 
-    .special-options {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
+    .special-options { display: flex; gap: 8px; margin-bottom: 20px; }
     .special-options .res-option { flex: 1; justify-content: center; }
 
-    /* ── Mode tabs (Video / Audio) ────────────────────────────────── */
-    .mode-tabs {
-      display: flex;
-      gap: 4px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 20px;
-    }
-    .mode-tab {
-      flex: 1;
-      text-align: center;
-      padding: 10px 16px;
-      border-radius: 9px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s;
-      color: var(--text-dim);
-      border: none;
-      background: none;
-    }
+    /* ── Mode tabs ─────────────────────────────────────────────────── */
+    .mode-tabs { display: flex; gap: 4px; background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 4px; margin-bottom: 20px; }
+    .mode-tab { flex: 1; text-align: center; padding: 10px 16px; border-radius: 9px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.25s; color: var(--text-dim); border: none; background: none; }
     .mode-tab:hover { color: var(--text); }
-    .mode-tab.active {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .mode-tab.active.video-active {
-      background: linear-gradient(135deg, rgba(66,153,225,0.2), rgba(102,126,234,0.15));
-      color: var(--accent);
-    }
-    .mode-tab.active.audio-active {
-      background: linear-gradient(135deg, rgba(159,122,234,0.2), rgba(183,148,244,0.15));
-      color: #b794f4;
-    }
+    .mode-tab.active { background: rgba(255, 255, 255, 0.08); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .mode-tab.active.video-active { background: linear-gradient(135deg, rgba(66,153,225,0.2), rgba(102,126,234,0.15)); color: var(--accent); }
+    .mode-tab.active.audio-active { background: linear-gradient(135deg, rgba(159,122,234,0.2), rgba(183,148,244,0.15)); color: var(--purple); }
 
     /* ── Audio panel ──────────────────────────────────────────────── */
-    .audio-panel {
-      display: none;
-      animation: slideUp 0.3s ease;
-    }
+    .audio-panel { display: none; animation: slideUp 0.3s ease; }
     .audio-panel.show { display: block; }
-
-    .audio-section-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
+    .audio-section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); margin-bottom: 10px; font-weight: 600; }
     .audio-section-label:not(:first-child) { margin-top: 18px; }
 
-    .audio-format-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
+    .audio-format-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .audio-option {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
+      background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 12px 10px; cursor: pointer; transition: all 0.2s; text-align: center;
     }
-    .audio-option:hover {
-      background: var(--surface-hover);
-      border-color: rgba(255,255,255,0.15);
-    }
-    .audio-option.selected {
-      border-color: #b794f4;
-      background: rgba(159, 122, 234, 0.12);
-      box-shadow: 0 0 0 1px #b794f4;
-    }
-    .audio-option .af-name {
-      font-weight: 700;
-      font-size: 0.9rem;
-      display: block;
-    }
-    .audio-option .af-desc {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      margin-top: 2px;
-      display: block;
-    }
+    .audio-option:hover { background: var(--surface-hover); border-color: rgba(255,255,255,0.15); }
+    .audio-option.selected { border-color: var(--purple); background: rgba(159, 122, 234, 0.12); box-shadow: 0 0 0 1px var(--purple); }
+    .audio-option .af-name { font-weight: 700; font-size: 0.9rem; display: block; }
+    .audio-option .af-desc { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; display: block; }
+    .audio-option .af-size { font-size: 0.6rem; font-weight: 500; color: var(--accent); display: block; margin-top: 3px; }
 
-    .bitrate-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
+    .bitrate-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .bitrate-option {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 10px 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-      font-weight: 600;
-      font-size: 0.85rem;
+      background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 10px 8px; cursor: pointer; transition: all 0.2s; text-align: center; font-weight: 600; font-size: 0.85rem;
     }
-    .bitrate-option:hover {
-      background: var(--surface-hover);
-      border-color: rgba(255,255,255,0.15);
-    }
-    .bitrate-option.selected {
-      border-color: #b794f4;
-      background: rgba(159, 122, 234, 0.12);
-      box-shadow: 0 0 0 1px #b794f4;
-    }
-    .bitrate-option .br-sub {
-      font-size: 0.6rem;
-      font-weight: 400;
-      color: var(--text-muted);
-      display: block;
-      margin-top: 2px;
-    }
+    .bitrate-option:hover { background: var(--surface-hover); border-color: rgba(255,255,255,0.15); }
+    .bitrate-option.selected { border-color: var(--purple); background: rgba(159, 122, 234, 0.12); box-shadow: 0 0 0 1px var(--purple); }
+    .bitrate-option .br-sub { font-size: 0.6rem; font-weight: 400; color: var(--text-muted); display: block; margin-top: 2px; }
+    .bitrate-option .br-size { font-size: 0.6rem; font-weight: 500; color: var(--accent); display: block; margin-top: 3px; }
 
     .video-panel { margin-bottom: 16px; }
     .video-panel.hide { display: none; }
 
     .download-btn-row { text-align: center; }
     .btn-download {
-      padding: 14px 48px;
-      font-size: 1rem;
-      background: linear-gradient(135deg, #48bb78, #38a169);
-      color: white;
+      padding: 14px 48px; font-size: 1rem;
+      background: linear-gradient(135deg, #48bb78, #38a169); color: white;
       box-shadow: 0 4px 15px var(--green-glow);
     }
-    .btn-download:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-    }
+    .btn-download:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4); }
 
-    /* ── Progress card ────────────────────────────────────────────── */
-    .dl-progress {
-      display: none;
-      animation: slideUp 0.4s ease;
-    }
-    .dl-progress.show { display: block; }
-
-    .progress-bar-container {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 8px;
-      height: 8px;
-      overflow: hidden;
-      margin: 16px 0;
-    }
-    .progress-bar {
-      height: 100%;
-      border-radius: 8px;
-      background: linear-gradient(90deg, #4299e1, #667eea);
-      transition: width 0.3s ease;
-      width: 0%;
-      position: relative;
-    }
-    .progress-bar.done {
-      background: linear-gradient(90deg, #48bb78, #38a169);
-    }
-    .progress-bar.error {
-      background: linear-gradient(90deg, #fc8181, #e53e3e);
-    }
-
-    .progress-stats {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-    }
-    .progress-stats .pct { color: var(--text); font-weight: 600; font-size: 1.2rem; }
-
-    .dl-status {
-      text-align: center;
-      margin-top: 16px;
-      font-size: 0.85rem;
-    }
-    .dl-status.done { color: var(--green); }
-    .dl-status.error { color: var(--red); }
-
-    /* ── Restricted banner ────────────────────────────────────────── */
-    .restricted {
-      display: none;
-      text-align: center;
-      padding: 32px 20px;
-      animation: slideUp 0.4s ease;
-    }
+    /* ── Restricted ───────────────────────────────────────────────── */
+    .restricted { display: none; text-align: center; padding: 32px 20px; animation: slideUp 0.4s ease; }
     .restricted.show { display: block; }
-    .restricted .icon {
-      font-size: 3rem;
-      margin-bottom: 12px;
-      opacity: 0.6;
-    }
-    .restricted h3 {
-      color: var(--red);
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-    }
-    .restricted p {
-      color: var(--text-dim);
-      font-size: 0.85rem;
-      line-height: 1.5;
-    }
+    .restricted .icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.6; }
+    .restricted h3 { color: var(--red); font-size: 1.1rem; margin-bottom: 8px; }
+    .restricted p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
 
-    /* ── Direct file card ─────────────────────────────────────────── */
-    .direct-info {
-      display: none;
-      text-align: center;
-      padding: 20px;
-      animation: slideUp 0.4s ease;
-    }
+    /* ── Direct file ──────────────────────────────────────────────── */
+    .direct-info { display: none; text-align: center; padding: 20px; animation: slideUp 0.4s ease; }
     .direct-info.show { display: block; }
     .direct-info .file-icon { font-size: 2.5rem; margin-bottom: 12px; }
-    .direct-info .filename {
-      font-family: 'SF Mono', monospace;
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      word-break: break-all;
-      margin-bottom: 20px;
+    .direct-info .filename { font-family: 'SF Mono', monospace; font-size: 0.85rem; color: var(--text-dim); word-break: break-all; margin-bottom: 20px; }
+
+    /* ── Queue ─────────────────────────────────────────────────────── */
+    .queue-section { margin-top: 8px; }
+    .queue-label {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--text-muted); font-weight: 600; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
     }
+    .queue-label .q-count {
+      background: var(--accent); color: var(--bg); font-size: 0.6rem;
+      padding: 1px 7px; border-radius: 99px; font-weight: 700;
+    }
+
+    .q-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px; margin-bottom: 10px; animation: slideUp 0.3s ease;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .q-item.done { border-color: rgba(104, 211, 145, 0.2); }
+    .q-item.error { border-color: rgba(252, 129, 129, 0.2); }
+
+    .q-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .q-thumb { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; background: var(--bg2); flex-shrink: 0; }
+    .q-info { flex: 1; min-width: 0; }
+    .q-title { font-size: 0.82rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .q-quality { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+
+    .q-progress-row { display: flex; align-items: center; gap: 10px; }
+    .q-bar-wrap { flex: 1; background: rgba(0,0,0,0.4); border-radius: 6px; height: 6px; overflow: hidden; }
+    .q-bar {
+      height: 100%; border-radius: 6px; background: linear-gradient(90deg, #4299e1, #667eea);
+      transition: width 0.4s ease; width: 0%;
+    }
+    .q-bar.done { background: linear-gradient(90deg, #48bb78, #38a169); }
+    .q-bar.error { background: linear-gradient(90deg, #fc8181, #e53e3e); }
+    .q-pct { font-size: 0.75rem; font-weight: 700; min-width: 38px; text-align: right; }
+
+    .q-stats {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px; font-size: 0.7rem; color: var(--text-dim);
+    }
+    .q-stats .q-speed { color: var(--accent); font-weight: 600; }
+    .q-stats .q-eta { color: var(--yellow); }
+    .q-stats .q-size { color: var(--text-dim); }
+
+    .q-done-msg { margin-top: 8px; font-size: 0.78rem; color: var(--green); }
+    .q-error-msg { margin-top: 8px; font-size: 0.78rem; color: var(--red); }
 
     /* ── Footer ───────────────────────────────────────────────────── */
-    .footer {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-    .footer a { color: var(--text-dim); text-decoration: none; }
-
-    /* ── Toast ─────────────────────────────────────────────────────── */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 12px 20px;
-      font-size: 0.85rem;
-      backdrop-filter: blur(16px);
-      z-index: 100;
-      animation: toastIn 0.3s ease;
-      max-width: 320px;
-    }
-    .toast.out { animation: toastOut 0.3s ease forwards; }
-    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } }
-    @keyframes toastOut { to { opacity: 0; transform: translateY(10px); } }
-
-    /* ── History ───────────────────────────────────────────────────── */
-    .history { margin-top: 24px; }
-    .history h4 {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-    }
-    .history-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      background: rgba(0,0,0,0.15);
-      border-radius: 8px;
-      margin-bottom: 6px;
-      font-size: 0.82rem;
-      animation: slideUp 0.3s ease;
-    }
-    .history-item .hi-icon { font-size: 1rem; }
-    .history-item .hi-name { flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .history-item .hi-status { font-size: 0.75rem; }
-    .history-item .hi-status.done { color: var(--green); }
-    .history-item .hi-status.error { color: var(--red); }
+    .footer { text-align: center; margin-top: 40px; font-size: 0.75rem; color: var(--text-muted); }
 
     /* ── Responsive ───────────────────────────────────────────────── */
     @media (max-width: 480px) {
@@ -564,60 +246,43 @@
       .res-grid { grid-template-columns: 1fr; }
       .media-header { flex-direction: column; }
       .media-thumb { width: 100%; height: 160px; }
+      .audio-format-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
 <body>
 
-  <!-- Animated background orbs -->
-  <div class="bg-glow">
-    <div class="orb"></div>
-    <div class="orb"></div>
-    <div class="orb"></div>
-  </div>
+  <div class="bg-glow"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
 
   <div class="app">
-
-    <!-- Header -->
     <div class="header">
       <div class="logo"><span class="bolt">&#9889;</span>fastdl</div>
       <div class="sub">paste any link &middot; pick quality &middot; download</div>
     </div>
 
-    <!-- URL Input -->
+    <!-- URL Input (always visible) -->
     <div class="card active" id="inputCard">
       <div class="input-group">
-        <input
-          type="text"
-          class="url-input"
-          id="urlInput"
-          placeholder="Paste any URL here..."
-          autocomplete="off"
-          spellcheck="false"
-        />
-        <button class="btn btn-primary" id="fetchBtn" onclick="handleFetch()">
-          Fetch
-        </button>
+        <input type="text" class="url-input" id="urlInput" placeholder="Paste any URL here..." autocomplete="off" spellcheck="false" />
+        <button class="btn btn-primary" id="fetchBtn" onclick="handleFetch()">Fetch</button>
       </div>
     </div>
 
-    <!-- Restricted / Paywall banner -->
+    <!-- Restricted -->
     <div class="card restricted" id="restrictedCard">
       <div class="icon">&#128274;</div>
       <h3>Content Not Accessible</h3>
-      <p id="restrictedMsg">This content is protected, paywalled, or region-locked. Download is not possible.</p>
+      <p id="restrictedMsg">This content is protected, paywalled, or region-locked.</p>
     </div>
 
-    <!-- Direct file info -->
+    <!-- Direct file -->
     <div class="card direct-info" id="directCard">
       <div class="file-icon">&#128196;</div>
       <div class="filename" id="directFilename"></div>
-      <button class="btn btn-download" onclick="startDirectDownload()">
-        &#8595; Download File
-      </button>
+      <button class="btn btn-download" onclick="startDirectDownload()">&#8595; Download File</button>
     </div>
 
-    <!-- Media info + resolution/audio picker -->
+    <!-- Media info + quality picker -->
     <div class="card media-info" id="mediaCard">
       <div class="media-header">
         <img class="media-thumb" id="mediaThumbnail" src="" alt="" />
@@ -628,14 +293,9 @@
         </div>
       </div>
 
-      <!-- Mode tabs: Video | Audio -->
       <div class="mode-tabs">
-        <button class="mode-tab active video-active" id="tabVideo" onclick="switchTab('video')">
-          &#127916; Video
-        </button>
-        <button class="mode-tab" id="tabAudio" onclick="switchTab('audio')">
-          &#127925; Audio / MP3
-        </button>
+        <button class="mode-tab active video-active" id="tabVideo" onclick="switchTab('video')">&#127916; Video</button>
+        <button class="mode-tab" id="tabAudio" onclick="switchTab('audio')">&#127925; Audio / MP3</button>
       </div>
 
       <!-- Video panel -->
@@ -652,429 +312,401 @@
       <div class="audio-panel" id="audioPanel">
         <div class="audio-section-label">Format</div>
         <div class="audio-format-grid" id="audioFormatGrid">
-          <div class="audio-option selected" data-format="mp3" onclick="selectAudioFormat(this)">
-            <span class="af-name">MP3</span>
-            <span class="af-desc">Universal</span>
-          </div>
-          <div class="audio-option" data-format="flac" onclick="selectAudioFormat(this)">
-            <span class="af-name">FLAC</span>
-            <span class="af-desc">Lossless</span>
-          </div>
-          <div class="audio-option" data-format="wav" onclick="selectAudioFormat(this)">
-            <span class="af-name">WAV</span>
-            <span class="af-desc">Uncompressed</span>
-          </div>
-          <div class="audio-option" data-format="aac" onclick="selectAudioFormat(this)">
-            <span class="af-name">AAC</span>
-            <span class="af-desc">Apple / Web</span>
-          </div>
-          <div class="audio-option" data-format="opus" onclick="selectAudioFormat(this)">
-            <span class="af-name">OPUS</span>
-            <span class="af-desc">Modern / Small</span>
-          </div>
-          <div class="audio-option" data-format="ogg" onclick="selectAudioFormat(this)">
-            <span class="af-name">OGG</span>
-            <span class="af-desc">Open source</span>
-          </div>
+          <div class="audio-option selected" data-format="mp3" onclick="selectAudioFormat(this)"><span class="af-name">MP3</span><span class="af-desc">Universal</span></div>
+          <div class="audio-option" data-format="flac" onclick="selectAudioFormat(this)"><span class="af-name">FLAC</span><span class="af-desc">Lossless</span></div>
+          <div class="audio-option" data-format="wav" onclick="selectAudioFormat(this)"><span class="af-name">WAV</span><span class="af-desc">Uncompressed</span></div>
+          <div class="audio-option" data-format="aac" onclick="selectAudioFormat(this)"><span class="af-name">AAC</span><span class="af-desc">Apple / Web</span></div>
+          <div class="audio-option" data-format="opus" onclick="selectAudioFormat(this)"><span class="af-name">OPUS</span><span class="af-desc">Modern / Small</span></div>
+          <div class="audio-option" data-format="ogg" onclick="selectAudioFormat(this)"><span class="af-name">OGG</span><span class="af-desc">Open source</span></div>
         </div>
-
         <div class="audio-section-label">Quality / Bitrate</div>
         <div class="bitrate-grid" id="bitrateGrid">
-          <div class="bitrate-option" data-quality="128" onclick="selectBitrate(this)">
-            128k
-            <span class="br-sub">Small</span>
-          </div>
-          <div class="bitrate-option" data-quality="192" onclick="selectBitrate(this)">
-            192k
-            <span class="br-sub">Good</span>
-          </div>
-          <div class="bitrate-option" data-quality="256" onclick="selectBitrate(this)">
-            256k
-            <span class="br-sub">Great</span>
-          </div>
-          <div class="bitrate-option selected" data-quality="320" onclick="selectBitrate(this)">
-            320k
-            <span class="br-sub">Best</span>
-          </div>
+          <div class="bitrate-option" data-quality="128" onclick="selectBitrate(this)">128k<span class="br-sub">Small</span></div>
+          <div class="bitrate-option" data-quality="192" onclick="selectBitrate(this)">192k<span class="br-sub">Good</span></div>
+          <div class="bitrate-option" data-quality="256" onclick="selectBitrate(this)">256k<span class="br-sub">Great</span></div>
+          <div class="bitrate-option selected" data-quality="320" onclick="selectBitrate(this)">320k<span class="br-sub">Best</span></div>
         </div>
       </div>
 
       <div class="download-btn-row">
-        <button class="btn btn-download" id="dlBtn" onclick="startDownload()">
-          &#8595; Download
-        </button>
+        <button class="btn btn-download" id="dlBtn" onclick="startDownload()">&#8595; Download</button>
       </div>
     </div>
 
-    <!-- Download progress -->
-    <div class="card dl-progress" id="progressCard">
-      <div class="progress-stats">
-        <span class="pct" id="progressPct">0%</span>
-        <span id="progressSpeed"></span>
+    <!-- Download Queue (always visible when items exist) -->
+    <div class="queue-section" id="queueSection" style="display:none">
+      <div class="queue-label">
+        Downloads <span class="q-count" id="queueCount">0</span>
       </div>
-      <div class="progress-bar-container">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <div class="progress-stats">
-        <span id="progressStatus">Downloading...</span>
-        <span id="progressEta"></span>
-      </div>
-      <div class="dl-status" id="dlStatus"></div>
+      <div id="queueList"></div>
     </div>
 
-    <!-- Download history -->
-    <div class="history" id="historySection" style="display:none">
-      <h4>Recent Downloads</h4>
-      <div id="historyList"></div>
-    </div>
-
-    <div class="footer">
-      100% local &middot; no tracking &middot; powered by yt-dlp
-    </div>
+    <div class="footer">100% local &middot; no tracking &middot; powered by yt-dlp</div>
   </div>
 
-  <script>
-    // ── State ────────────────────────────────────────────────────────
-    let ws = null;
-    let currentMedia = null;
-    let selectedMode = 'best';
-    let selectedHeight = null;
-    let selectedTab = 'video';
-    let selectedAudioFormat = 'mp3';
-    let selectedBitrate = '320';
-    const history = [];
+<script>
+  // ── State ──────────────────────────────────────────────────────────
+  let ws = null;
+  let currentMedia = null;
+  let selectedMode = 'best';
+  let selectedHeight = null;
+  let selectedTab = 'video';
+  let selectedAudioFormat = 'mp3';
+  let selectedBitrate = '320';
 
-    // ── WebSocket ────────────────────────────────────────────────────
-    function connectWS() {
-      const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      ws = new WebSocket(`${protocol}//${location.hostname}:8889`);
+  // Queue: { id -> { title, thumbnail, quality, status, progress, speed, eta, total_size, downloaded, filename, error } }
+  const queue = new Map();
 
-      ws.onopen = () => console.log('WS connected');
-      ws.onclose = () => {
-        console.log('WS disconnected, reconnecting...');
-        setTimeout(connectWS, 2000);
-      };
-      ws.onerror = () => ws.close();
-      ws.onmessage = (e) => {
-        const msg = JSON.parse(e.data);
-        handleMessage(msg);
-      };
+  // ── Size helpers ───────────────────────────────────────────────────
+  function fmtB(bytes) {
+    if (!bytes || bytes <= 0) return '';
+    const u = ['B','KB','MB','GB','TB'];
+    let i = 0, v = bytes;
+    while (v >= 1024 && i < u.length - 1) { v /= 1024; i++; }
+    return v.toFixed(1) + ' ' + u[i];
+  }
+
+  function estAudio(dur, kbps) { return dur ? (kbps * 1000 / 8) * dur : 0; }
+  function estLossless(dur, fmt) {
+    if (!dur) return 0;
+    const wav = 44100 * 2 * 2 * dur;
+    return fmt === 'wav' ? wav : fmt === 'flac' ? wav * 0.55 : wav * 0.6;
+  }
+
+  function updateAudioSizes() {
+    if (!currentMedia || !currentMedia.duration) return;
+    const dur = currentMedia.duration;
+    document.querySelectorAll('.audio-option').forEach(el => {
+      const fmt = el.dataset.format;
+      let s = el.querySelector('.af-size');
+      if (!s) { s = document.createElement('span'); s.className = 'af-size'; el.appendChild(s); }
+      const bytes = ['flac','wav'].includes(fmt) ? estLossless(dur, fmt) : estAudio(dur, parseInt(selectedBitrate));
+      s.textContent = bytes ? '~' + fmtB(bytes) : '';
+    });
+    document.querySelectorAll('.bitrate-option').forEach(el => {
+      const br = parseInt(el.dataset.quality);
+      let s = el.querySelector('.br-size');
+      if (!s) { s = document.createElement('span'); s.className = 'br-size'; el.appendChild(s); }
+      s.textContent = fmtB(estAudio(dur, br)) ? '~' + fmtB(estAudio(dur, br)) : '';
+    });
+  }
+
+  // ── WebSocket ──────────────────────────────────────────────────────
+  function connectWS() {
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${proto}//${location.hostname}:8889`);
+    ws.onopen = () => console.log('WS connected');
+    ws.onclose = () => { console.log('WS disconnected'); setTimeout(connectWS, 2000); };
+    ws.onerror = () => ws.close();
+    ws.onmessage = (e) => handleMessage(JSON.parse(e.data));
+  }
+
+  function handleMessage(msg) {
+    // Probe result
+    if (msg.action === 'probe_result') {
+      setFetching(false);
+      if (msg.error === 'restricted') { showRestricted(msg.message); return; }
+      if (msg.error) { showRestricted(msg.message || 'Could not fetch media info.'); return; }
+      if (msg.type === 'direct') { showDirect(msg); return; }
+      showMedia(msg);
+      return;
     }
 
-    function handleMessage(msg) {
-      // Probe result
-      if (msg.action === 'probe_result') {
-        setFetching(false);
+    // Download started — add to queue
+    if (msg.action === 'download_started') {
+      queue.set(msg.id, {
+        title: msg.title || 'Download',
+        thumbnail: msg.thumbnail || '',
+        quality: msg.quality || '',
+        status: 'downloading',
+        progress: 0, speed: '', eta: '',
+        total_size: '', downloaded: '', filename: '', error: '',
+      });
+      renderQueue();
+      return;
+    }
 
-        if (msg.error === 'restricted') {
-          showRestricted(msg.message);
-          return;
-        }
-        if (msg.error) {
-          showRestricted(msg.message || 'Could not fetch media info. The URL may be invalid or unsupported.');
-          return;
-        }
-        if (msg.type === 'direct') {
-          showDirect(msg);
-          return;
-        }
-        showMedia(msg);
-        return;
-      }
+    // Progress updates — route to correct queue item
+    if (msg.id && queue.has(msg.id)) {
+      const item = queue.get(msg.id);
 
-      // Download started
-      if (msg.action === 'download_started') {
-        showProgress();
-        return;
-      }
-
-      // Download progress
       if (msg.status === 'downloading') {
-        updateProgress(msg.progress || 0, msg.speed || '', msg.eta || '');
+        item.status = 'downloading';
+        item.progress = msg.progress || 0;
+        item.speed = msg.speed || '';
+        item.eta = msg.eta || '';
+        item.total_size = msg.total_size || item.total_size || '';
+        item.downloaded = msg.downloaded || '';
       }
       if (msg.status === 'processing') {
-        updateProgress(100, '', '');
-        document.getElementById('progressStatus').textContent = 'Merging audio + video...';
+        item.status = 'processing';
+        item.progress = 100;
+        item.speed = '';
+        item.eta = '';
       }
       if (msg.status === 'done') {
-        downloadDone(msg.filename || 'Download complete', msg.size || '');
+        item.status = 'done';
+        item.progress = 100;
+        item.filename = msg.filename || '';
+        item.speed = '';
+        item.eta = '';
       }
       if (msg.status === 'error') {
-        downloadError(msg.message || 'Download failed.');
-      }
-    }
-
-    // ── Fetch ────────────────────────────────────────────────────────
-    function handleFetch() {
-      const url = document.getElementById('urlInput').value.trim();
-      if (!url) return;
-
-      hideAll();
-      setFetching(true);
-      ws.send(JSON.stringify({ action: 'probe', url }));
-    }
-
-    function setFetching(on) {
-      const btn = document.getElementById('fetchBtn');
-      if (on) {
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span>Fetching';
-      } else {
-        btn.disabled = false;
-        btn.textContent = 'Fetch';
-      }
-    }
-
-    // ── Show panels ──────────────────────────────────────────────────
-    function hideAll() {
-      ['mediaCard', 'restrictedCard', 'directCard', 'progressCard'].forEach(id => {
-        document.getElementById(id).classList.remove('show');
-      });
-    }
-
-    function showRestricted(msg) {
-      document.getElementById('restrictedMsg').textContent = msg;
-      document.getElementById('restrictedCard').classList.add('show');
-    }
-
-    function showDirect(data) {
-      currentMedia = data;
-      document.getElementById('directFilename').textContent = data.filename || data.url;
-      document.getElementById('directCard').classList.add('show');
-    }
-
-    function showMedia(data) {
-      currentMedia = data;
-
-      // Thumbnail
-      const thumb = document.getElementById('mediaThumbnail');
-      if (data.thumbnail) {
-        thumb.src = data.thumbnail;
-        thumb.style.display = 'block';
-      } else {
-        thumb.style.display = 'none';
+        item.status = 'error';
+        item.error = msg.message || 'Failed';
       }
 
-      document.getElementById('mediaTitle').textContent = data.title || 'Unknown';
-      document.getElementById('mediaUploader').textContent = data.uploader || '';
+      renderQueue();
+    }
+  }
 
-      if (data.duration) {
-        const m = Math.floor(data.duration / 60);
-        const s = Math.floor(data.duration % 60);
-        const h = Math.floor(m / 60);
-        document.getElementById('mediaDuration').textContent =
-          h ? `${h}h ${m % 60}m ${s}s` : `${m}m ${s}s`;
-      }
+  // ── Fetch ──────────────────────────────────────────────────────────
+  function handleFetch() {
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url) return;
+    hideAll();
+    setFetching(true);
+    ws.send(JSON.stringify({ action: 'probe', url }));
+  }
 
-      // Resolution grid
-      const grid = document.getElementById('resGrid');
-      grid.innerHTML = '';
-      const resolutions = data.resolutions || [];
-      const maxH = resolutions.length ? resolutions[resolutions.length - 1].height : 0;
+  function setFetching(on) {
+    const btn = document.getElementById('fetchBtn');
+    if (on) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Fetching'; }
+    else { btn.disabled = false; btn.textContent = 'Fetch'; }
+  }
 
-      resolutions.forEach(r => {
-        const div = document.createElement('div');
-        div.className = 'res-option';
-        div.dataset.height = r.height;
-        div.dataset.mode = 'video';
-        div.onclick = () => selectOption(div);
+  // ── Panels ─────────────────────────────────────────────────────────
+  function hideAll() {
+    ['mediaCard','restrictedCard','directCard'].forEach(id => document.getElementById(id).classList.remove('show'));
+  }
+  function showRestricted(msg) {
+    document.getElementById('restrictedMsg').textContent = msg;
+    document.getElementById('restrictedCard').classList.add('show');
+  }
+  function showDirect(data) {
+    currentMedia = data;
+    document.getElementById('directFilename').textContent = data.filename || data.url;
+    document.getElementById('directCard').classList.add('show');
+  }
 
-        let inner = `<span class="res-label">${r.label}</span>`;
-        const right = [];
-        if (r.size) right.push(`<span class="res-size">${r.size}</span>`);
-        if (r.height === maxH) right.push(`<span class="res-badge">SOURCE</span>`);
-        inner += `<span>${right.join(' ')}</span>`;
-        div.innerHTML = inner;
-        grid.appendChild(div);
-      });
+  function showMedia(data) {
+    currentMedia = data;
 
-      // Default: video tab, best quality
-      switchTab('video');
-      selectedMode = 'best';
-      selectedHeight = null;
-      document.querySelectorAll('#videoPanel .res-option').forEach(el => el.classList.remove('selected'));
-      const bestBtn = document.querySelector('[data-mode="best"]');
-      if (bestBtn) bestBtn.classList.add('selected');
+    const thumb = document.getElementById('mediaThumbnail');
+    if (data.thumbnail) { thumb.src = data.thumbnail; thumb.style.display = 'block'; }
+    else { thumb.style.display = 'none'; }
 
-      document.getElementById('mediaCard').classList.add('show');
+    document.getElementById('mediaTitle').textContent = data.title || 'Unknown';
+    document.getElementById('mediaUploader').textContent = data.uploader || '';
+
+    if (data.duration) {
+      const m = Math.floor(data.duration / 60), s = Math.floor(data.duration % 60), h = Math.floor(m / 60);
+      document.getElementById('mediaDuration').textContent = h ? `${h}h ${m%60}m ${s}s` : `${m}m ${s}s`;
     }
 
-    // ── Tab switching ────────────────────────────────────────────────
-    function switchTab(tab) {
-      selectedTab = tab;
-      const tabVideo = document.getElementById('tabVideo');
-      const tabAudio = document.getElementById('tabAudio');
-      const videoPanel = document.getElementById('videoPanel');
-      const audioPanel = document.getElementById('audioPanel');
-      const dlBtn = document.getElementById('dlBtn');
+    // Resolution grid with sizes
+    const grid = document.getElementById('resGrid');
+    grid.innerHTML = '';
+    const res = data.resolutions || [];
+    const maxH = res.length ? res[res.length - 1].height : 0;
 
-      tabVideo.classList.remove('active', 'video-active');
-      tabAudio.classList.remove('active', 'audio-active');
+    res.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'res-option';
+      div.dataset.height = r.height;
+      div.dataset.mode = 'video';
+      div.onclick = () => selectOption(div);
 
-      if (tab === 'video') {
-        tabVideo.classList.add('active', 'video-active');
-        videoPanel.classList.remove('hide');
-        videoPanel.style.display = '';
-        audioPanel.classList.remove('show');
-        dlBtn.innerHTML = '&#8595; Download Video';
-      } else {
-        tabAudio.classList.add('active', 'audio-active');
-        videoPanel.classList.add('hide');
-        videoPanel.style.display = 'none';
-        audioPanel.classList.add('show');
-        selectedMode = 'audio';
-        dlBtn.innerHTML = '&#127925; Download Audio';
-      }
-    }
-
-    function selectOption(el) {
-      document.querySelectorAll('#videoPanel .res-option').forEach(e => e.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedMode = el.dataset.mode;
-      selectedHeight = el.dataset.height ? parseInt(el.dataset.height) : null;
-    }
-
-    function selectAudioFormat(el) {
-      document.querySelectorAll('.audio-option').forEach(e => e.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedAudioFormat = el.dataset.format;
-
-      // Show/hide bitrate options for lossless formats
-      const bitrateGrid = document.getElementById('bitrateGrid');
-      const lossless = ['flac', 'wav'];
-      if (lossless.includes(selectedAudioFormat)) {
-        bitrateGrid.style.opacity = '0.3';
-        bitrateGrid.style.pointerEvents = 'none';
-      } else {
-        bitrateGrid.style.opacity = '1';
-        bitrateGrid.style.pointerEvents = 'auto';
-      }
-    }
-
-    function selectBitrate(el) {
-      document.querySelectorAll('.bitrate-option').forEach(e => e.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedBitrate = el.dataset.quality;
-    }
-
-    // ── Download ─────────────────────────────────────────────────────
-    function startDownload() {
-      if (!currentMedia) return;
-
-      const payload = {
-        action: 'download',
-        url: currentMedia.url,
-        type: 'media',
-        mode: selectedTab === 'audio' ? 'audio' : selectedMode,
-        height: selectedHeight,
-      };
-
-      // Add audio params when in audio mode
-      if (selectedTab === 'audio') {
-        payload.audio_format = selectedAudioFormat;
-        payload.audio_quality = selectedBitrate;
-      }
-
-      ws.send(JSON.stringify(payload));
-    }
-
-    function startDirectDownload() {
-      if (!currentMedia) return;
-      ws.send(JSON.stringify({
-        action: 'download',
-        url: currentMedia.url,
-        type: 'direct',
-      }));
-    }
-
-    function showProgress() {
-      document.getElementById('progressCard').classList.add('show');
-      document.getElementById('mediaCard').classList.remove('show');
-      document.getElementById('directCard').classList.remove('show');
-      document.getElementById('progressBar').style.width = '0%';
-      document.getElementById('progressBar').className = 'progress-bar';
-      document.getElementById('progressPct').textContent = '0%';
-      document.getElementById('progressSpeed').textContent = '';
-      document.getElementById('progressStatus').textContent = 'Starting download...';
-      document.getElementById('progressEta').textContent = '';
-      document.getElementById('dlStatus').textContent = '';
-      document.getElementById('dlStatus').className = 'dl-status';
-    }
-
-    function updateProgress(pct, speed, eta) {
-      document.getElementById('progressBar').style.width = pct + '%';
-      document.getElementById('progressPct').textContent = Math.round(pct) + '%';
-      document.getElementById('progressSpeed').textContent = speed;
-      document.getElementById('progressStatus').textContent = 'Downloading...';
-      document.getElementById('progressEta').textContent = eta ? `ETA ${eta}` : '';
-    }
-
-    function downloadDone(filename, size) {
-      document.getElementById('progressBar').style.width = '100%';
-      document.getElementById('progressBar').classList.add('done');
-      document.getElementById('progressPct').textContent = '100%';
-      document.getElementById('progressSpeed').textContent = '';
-      document.getElementById('progressStatus').textContent = 'Saved to ~/Downloads';
-      document.getElementById('progressEta').textContent = size || '';
-      document.getElementById('dlStatus').className = 'dl-status done';
-      document.getElementById('dlStatus').textContent = filename;
-
-      addHistory(filename, true);
-    }
-
-    function downloadError(msg) {
-      document.getElementById('progressBar').classList.add('error');
-      document.getElementById('progressPct').textContent = '';
-      document.getElementById('progressStatus').textContent = msg;
-      document.getElementById('dlStatus').className = 'dl-status error';
-      document.getElementById('dlStatus').textContent = 'Failed';
-
-      addHistory(msg, false);
-    }
-
-    function addHistory(name, success) {
-      history.unshift({ name, success, time: new Date() });
-      if (history.length > 10) history.pop();
-      renderHistory();
-    }
-
-    function renderHistory() {
-      const section = document.getElementById('historySection');
-      const list = document.getElementById('historyList');
-      if (!history.length) { section.style.display = 'none'; return; }
-      section.style.display = 'block';
-      list.innerHTML = history.map(h => `
-        <div class="history-item">
-          <span class="hi-icon">${h.success ? '&#9989;' : '&#10060;'}</span>
-          <span class="hi-name">${escHtml(h.name)}</span>
-          <span class="hi-status ${h.success ? 'done' : 'error'}">${h.success ? 'Done' : 'Failed'}</span>
-        </div>
-      `).join('');
-    }
-
-    function escHtml(s) {
-      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
-
-    // ── Keyboard shortcut ────────────────────────────────────────────
-    document.getElementById('urlInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleFetch();
+      let lbl = `<span class="res-label">${r.label}</span>`;
+      const right = [];
+      if (r.size) right.push(`<span class="res-size">${r.size}</span>`);
+      if (r.height === maxH) right.push(`<span class="res-badge">SOURCE</span>`);
+      lbl += `<span>${right.join(' ')}</span>`;
+      div.innerHTML = lbl;
+      grid.appendChild(div);
     });
 
-    // Auto-paste on focus (if clipboard API available)
-    document.getElementById('urlInput').addEventListener('focus', async () => {
-      try {
-        if (navigator.clipboard && !document.getElementById('urlInput').value) {
-          const text = await navigator.clipboard.readText();
-          if (text && /^https?:\/\//.test(text.trim())) {
-            document.getElementById('urlInput').value = text.trim();
-          }
-        }
-      } catch {}
-    });
+    // Best quality with size
+    const bestBtn = document.querySelector('[data-mode="best"]');
+    if (bestBtn) {
+      const sizeStr = data.best_total_size ? `<span class="res-size">~${fmtB(data.best_total_size)}</span>` : '';
+      bestBtn.innerHTML = `<span class="res-label">&#127911; Best Quality</span>${sizeStr}`;
+    }
 
-    // ── Init ─────────────────────────────────────────────────────────
-    connectWS();
-  </script>
+    switchTab('video');
+    selectedMode = 'best';
+    selectedHeight = null;
+    document.querySelectorAll('#videoPanel .res-option').forEach(el => el.classList.remove('selected'));
+    if (bestBtn) bestBtn.classList.add('selected');
+    updateAudioSizes();
+    document.getElementById('mediaCard').classList.add('show');
+  }
+
+  // ── Tabs ───────────────────────────────────────────────────────────
+  function switchTab(tab) {
+    selectedTab = tab;
+    const tv = document.getElementById('tabVideo'), ta = document.getElementById('tabAudio');
+    const vp = document.getElementById('videoPanel'), ap = document.getElementById('audioPanel');
+    const dl = document.getElementById('dlBtn');
+    tv.classList.remove('active','video-active');
+    ta.classList.remove('active','audio-active');
+    if (tab === 'video') {
+      tv.classList.add('active','video-active'); vp.style.display = ''; ap.classList.remove('show');
+      dl.innerHTML = '&#8595; Download Video';
+    } else {
+      ta.classList.add('active','audio-active'); vp.style.display = 'none'; ap.classList.add('show');
+      selectedMode = 'audio';
+      dl.innerHTML = '&#127925; Download Audio';
+    }
+  }
+
+  function selectOption(el) {
+    document.querySelectorAll('#videoPanel .res-option').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedMode = el.dataset.mode;
+    selectedHeight = el.dataset.height ? parseInt(el.dataset.height) : null;
+  }
+
+  function selectAudioFormat(el) {
+    document.querySelectorAll('.audio-option').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedAudioFormat = el.dataset.format;
+    const bg = document.getElementById('bitrateGrid');
+    const lossless = ['flac','wav'];
+    bg.style.opacity = lossless.includes(selectedAudioFormat) ? '0.3' : '1';
+    bg.style.pointerEvents = lossless.includes(selectedAudioFormat) ? 'none' : 'auto';
+    updateAudioSizes();
+  }
+
+  function selectBitrate(el) {
+    document.querySelectorAll('.bitrate-option').forEach(e => e.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedBitrate = el.dataset.quality;
+    updateAudioSizes();
+  }
+
+  // ── Download (adds to queue, keeps picker open for next) ───────────
+  function startDownload() {
+    if (!currentMedia) return;
+    const payload = {
+      action: 'download',
+      url: currentMedia.url,
+      type: 'media',
+      mode: selectedTab === 'audio' ? 'audio' : selectedMode,
+      height: selectedHeight,
+      title: currentMedia.title || '',
+      thumbnail: currentMedia.thumbnail || '',
+    };
+    if (selectedTab === 'audio') {
+      payload.audio_format = selectedAudioFormat;
+      payload.audio_quality = selectedBitrate;
+    }
+    ws.send(JSON.stringify(payload));
+
+    // Reset input for next URL — keep queue visible
+    hideAll();
+    document.getElementById('urlInput').value = '';
+    document.getElementById('urlInput').focus();
+  }
+
+  function startDirectDownload() {
+    if (!currentMedia) return;
+    ws.send(JSON.stringify({
+      action: 'download',
+      url: currentMedia.url,
+      type: 'direct',
+      title: currentMedia.filename || currentMedia.url,
+    }));
+    hideAll();
+    document.getElementById('urlInput').value = '';
+    document.getElementById('urlInput').focus();
+  }
+
+  // ── Queue rendering ────────────────────────────────────────────────
+  function renderQueue() {
+    const section = document.getElementById('queueSection');
+    const list = document.getElementById('queueList');
+    const countEl = document.getElementById('queueCount');
+
+    if (queue.size === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+
+    const active = [...queue.values()].filter(q => q.status === 'downloading' || q.status === 'processing').length;
+    countEl.textContent = active > 0 ? active + ' active' : queue.size;
+
+    let html = '';
+    // Render in reverse order (newest first)
+    const entries = [...queue.entries()].reverse();
+
+    for (const [id, q] of entries) {
+      const isDone = q.status === 'done';
+      const isErr = q.status === 'error';
+      const isProcessing = q.status === 'processing';
+      const cls = isDone ? 'done' : isErr ? 'error' : '';
+      const barCls = isDone ? 'done' : isErr ? 'error' : '';
+
+      const thumbHtml = q.thumbnail
+        ? `<img class="q-thumb" src="${esc(q.thumbnail)}" alt="" />`
+        : `<div class="q-thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem;">${isDone ? '&#9989;' : isErr ? '&#10060;' : '&#9889;'}</div>`;
+
+      let statsHtml = '';
+      if (isDone) {
+        statsHtml = `<div class="q-done-msg">&#9989; Saved to ~/Downloads/${esc(q.filename)}</div>`;
+      } else if (isErr) {
+        statsHtml = `<div class="q-error-msg">&#10060; ${esc(q.error)}</div>`;
+      } else if (isProcessing) {
+        statsHtml = `<div class="q-stats"><span>Merging audio + video...</span><span></span></div>`;
+      } else {
+        const parts = [];
+        if (q.speed) parts.push(`<span class="q-speed">${esc(q.speed)}</span>`);
+        if (q.downloaded && q.total_size) parts.push(`<span class="q-size">${esc(q.downloaded)} / ${esc(q.total_size)}</span>`);
+        else if (q.total_size) parts.push(`<span class="q-size">${esc(q.total_size)}</span>`);
+        const etaHtml = q.eta ? `<span class="q-eta">&#9203; ${esc(q.eta)} left</span>` : '';
+        statsHtml = `<div class="q-stats"><span>${parts.join(' &middot; ')}</span>${etaHtml}</div>`;
+      }
+
+      html += `
+        <div class="q-item ${cls}">
+          <div class="q-top">
+            ${thumbHtml}
+            <div class="q-info">
+              <div class="q-title">${esc(q.title)}</div>
+              <div class="q-quality">${esc(q.quality)}</div>
+            </div>
+          </div>
+          <div class="q-progress-row">
+            <div class="q-bar-wrap"><div class="q-bar ${barCls}" style="width:${q.progress}%"></div></div>
+            <span class="q-pct">${Math.round(q.progress)}%</span>
+          </div>
+          ${statsHtml}
+        </div>`;
+    }
+
+    list.innerHTML = html;
+  }
+
+  function esc(s) {
+    if (!s) return '';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Keyboard ───────────────────────────────────────────────────────
+  document.getElementById('urlInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleFetch();
+  });
+
+  // Auto-paste on focus
+  document.getElementById('urlInput').addEventListener('focus', async () => {
+    try {
+      if (navigator.clipboard && !document.getElementById('urlInput').value) {
+        const text = await navigator.clipboard.readText();
+        if (text && /^https?:\/\//.test(text.trim())) document.getElementById('urlInput').value = text.trim();
+      }
+    } catch {}
+  });
+
+  // ── Init ───────────────────────────────────────────────────────────
+  connectWS();
+</script>
 </body>
 </html>
