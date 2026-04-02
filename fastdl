@@ -1,0 +1,332 @@
+#!/usr/bin/env python3
+"""fastdl - Terminal fast downloader with quality selection."""
+
+import subprocess
+import sys
+import os
+import json
+import shutil
+import re
+import signal
+
+# ── Colors ──────────────────────────────────────────────────────────────────
+BOLD = "\033[1m"
+DIM = "\033[2m"
+RED = "\033[91m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+CYAN = "\033[96m"
+MAGENTA = "\033[95m"
+RESET = "\033[0m"
+
+DOWNLOAD_DIR = os.path.expanduser("~/Downloads")
+
+
+def die(msg):
+    print(f"\n{RED}Error:{RESET} {msg}")
+    sys.exit(1)
+
+
+def check_deps():
+    missing = []
+    for cmd in ["yt-dlp", "ffmpeg", "curl"]:
+        if not shutil.which(cmd):
+            missing.append(cmd)
+    if missing:
+        die(f"Missing required tools: {', '.join(missing)}\n  Install with: brew install {' '.join(missing)}")
+
+
+def is_direct_file(url):
+    """Check if URL points to a direct file (not a video platform)."""
+    direct_exts = (
+        ".zip", ".tar", ".gz", ".bz2", ".xz", ".7z", ".rar",
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx",
+        ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp", ".ico",
+        ".exe", ".dmg", ".pkg", ".deb", ".rpm", ".appimage",
+        ".iso", ".img", ".bin",
+        ".csv", ".json", ".xml", ".txt", ".log",
+        ".ttf", ".otf", ".woff", ".woff2",
+        ".apk", ".ipa",
+    )
+    path = url.split("?")[0].split("#")[0].lower()
+    return any(path.endswith(ext) for ext in direct_exts)
+
+
+def download_direct(url):
+    """Download a direct file link using curl."""
+    filename = url.split("?")[0].split("#")[0].split("/")[-1]
+    if not filename:
+        filename = "download"
+    dest = os.path.join(DOWNLOAD_DIR, filename)
+
+    # Avoid overwriting
+    base, ext = os.path.splitext(dest)
+    counter = 1
+    while os.path.exists(dest):
+        dest = f"{base}_{counter}{ext}"
+        counter += 1
+
+    print(f"\n{CYAN}Downloading:{RESET} {filename}")
+    print(f"{DIM}Saving to:{RESET}   {dest}\n")
+
+    cmd = [
+        "curl", "-L", "--progress-bar",
+        "-o", dest,
+        "-H", "User-Agent: Mozilla/5.0",
+        url,
+    ]
+    result = subprocess.run(cmd)
+    if result.returncode == 0 and os.path.exists(dest):
+        size = os.path.getsize(dest)
+        print(f"\n{GREEN}Done!{RESET} {format_size(size)} saved to {dest}")
+    else:
+        die("Download failed.")
+
+
+def format_size(nbytes):
+    for unit in ("B", "KB", "MB", "GB", "TB"):
+        if nbytes < 1024:
+            return f"{nbytes:.1f} {unit}"
+        nbytes /= 1024
+    return f"{nbytes:.1f} PB"
+
+
+def probe_formats(url):
+    """Use yt-dlp to list available formats."""
+    print(f"\n{DIM}Fetching available formats...{RESET}")
+    cmd = ["yt-dlp", "-j", "--no-warnings", url]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        return None
+
+    try:
+        info = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+
+    return info
+
+
+def pick_resolution(info):
+    """Show resolution options and let user pick."""
+    title = info.get("title", "Unknown")
+    duration = info.get("duration")
+    uploader = info.get("uploader", "")
+
+    print(f"\n{BOLD}{title}{RESET}")
+    if uploader:
+        print(f"{DIM}by {uploader}{RESET}")
+    if duration:
+        mins, secs = divmod(int(duration), 60)
+        hrs, mins = divmod(mins, 60)
+        if hrs:
+            print(f"{DIM}Duration: {hrs}h {mins}m {secs}s{RESET}")
+        else:
+            print(f"{DIM}Duration: {mins}m {secs}s{RESET}")
+
+    formats = info.get("formats", [])
+
+    # Collect unique video resolutions
+    resolutions = {}
+    for f in formats:
+        h = f.get("height")
+        if h and f.get("vcodec", "none") != "none":
+            if h not in resolutions or (f.get("filesize") or 0) > (resolutions[h].get("filesize") or 0):
+                resolutions[h] = f
+
+    if not resolutions:
+        return "best", None
+
+    sorted_res = sorted(resolutions.keys())
+
+    # Standard resolution tiers
+    standard = [144, 240, 360, 480, 720, 1080, 1440, 2160, 4320]
+    available = []
+    for s in standard:
+        if s in resolutions:
+            available.append(s)
+
+    # Add any non-standard ones too
+    for h in sorted_res:
+        if h not in available:
+            available.append(h)
+    available.sort()
+
+    if not available:
+        return "best", None
+
+    labels = {
+        144: "144p",
+        240: "240p",
+        360: "360p",
+        480: "480p  (SD)",
+        720: "720p  (HD)",
+        1080: "1080p (Full HD)",
+        1440: "1440p (2K)",
+        2160: "2160p (4K)",
+        4320: "4320p (8K)",
+    }
+
+    max_h = available[-1]
+
+    print(f"\n{BOLD}Available resolutions:{RESET}\n")
+    for i, h in enumerate(available, 1):
+        label = labels.get(h, f"{h}p")
+        f = resolutions[h]
+        size_str = ""
+        if f.get("filesize"):
+            size_str = f" {DIM}~{format_size(f['filesize'])}{RESET}"
+        elif f.get("filesize_approx"):
+            size_str = f" {DIM}~{format_size(f['filesize_approx'])}{RESET}"
+
+        marker = f" {YELLOW}<- source{RESET}" if h == max_h else ""
+        print(f"  {CYAN}{i}{RESET}) {label}{size_str}{marker}")
+
+    print(f"\n  {CYAN}a{RESET}) Audio only (pick format + quality)")
+    print(f"  {CYAN}b{RESET}) Best video+audio (default)")
+
+    print()
+    choice = input(f"{BOLD}Pick quality [{len(available)}]: {RESET}").strip().lower()
+
+    if choice == "a":
+        return "audio", None
+    if choice == "b" or choice == "":
+        return "best", None
+
+    try:
+        idx = int(choice) - 1
+        if 0 <= idx < len(available):
+            return "video", available[idx]
+    except ValueError:
+        pass
+
+    print(f"{YELLOW}Invalid choice, using best quality.{RESET}")
+    return "best", None
+
+
+def pick_audio_options():
+    """Let user pick audio format and quality."""
+    formats = ["mp3", "flac", "wav", "aac", "opus", "ogg"]
+    descs = ["Universal", "Lossless", "Uncompressed", "Apple/Web", "Modern/Small", "Open source"]
+
+    print(f"\n{BOLD}Audio format:{RESET}\n")
+    for i, (fmt, desc) in enumerate(zip(formats, descs), 1):
+        default = f" {YELLOW}<- default{RESET}" if fmt == "mp3" else ""
+        print(f"  {CYAN}{i}{RESET}) {fmt.upper():6s} {DIM}{desc}{RESET}{default}")
+
+    choice = input(f"\n{BOLD}Pick format [1]: {RESET}").strip()
+    try:
+        idx = int(choice) - 1
+        audio_fmt = formats[idx] if 0 <= idx < len(formats) else "mp3"
+    except (ValueError, IndexError):
+        audio_fmt = "mp3"
+
+    # Lossless formats don't need bitrate
+    if audio_fmt in ("flac", "wav"):
+        print(f"{DIM}Lossless format — best quality automatically.{RESET}")
+        return audio_fmt, "0"
+
+    bitrates = ["128", "192", "256", "320"]
+    labels_br = ["Small", "Good", "Great", "Best"]
+
+    print(f"\n{BOLD}Bitrate:{RESET}\n")
+    for i, (br, lbl) in enumerate(zip(bitrates, labels_br), 1):
+        default = f" {YELLOW}<- default{RESET}" if br == "320" else ""
+        print(f"  {CYAN}{i}{RESET}) {br}k  {DIM}{lbl}{RESET}{default}")
+
+    choice = input(f"\n{BOLD}Pick bitrate [4]: {RESET}").strip()
+    aq_map = {"128": "5", "192": "2", "256": "1", "320": "0"}
+    try:
+        idx = int(choice) - 1
+        br = bitrates[idx] if 0 <= idx < len(bitrates) else "320"
+    except (ValueError, IndexError):
+        br = "320"
+
+    return audio_fmt, aq_map.get(br, "0")
+
+
+def download_media(url, mode, height, audio_fmt="mp3", audio_quality="0"):
+    """Download media with yt-dlp."""
+    cmd = ["yt-dlp", "--no-warnings", "--progress"]
+
+    if mode == "audio":
+        cmd += ["-x", "--audio-format", audio_fmt, "--audio-quality", audio_quality]
+        print(f"\n{MAGENTA}Downloading audio ({audio_fmt.upper()})...{RESET}\n")
+    elif mode == "video" and height:
+        cmd += [
+            "-f", f"bestvideo[height<={height}]+bestaudio/best[height<={height}]/best",
+            "--merge-output-format", "mp4",
+        ]
+        print(f"\n{MAGENTA}Downloading {height}p video...{RESET}\n")
+    else:
+        cmd += ["-f", "bestvideo+bestaudio/best", "--merge-output-format", "mp4"]
+        print(f"\n{MAGENTA}Downloading best quality...{RESET}\n")
+
+    cmd += [
+        "-o", os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s"),
+        "--restrict-filenames",
+        url,
+    ]
+
+    result = subprocess.run(cmd)
+    if result.returncode == 0:
+        print(f"\n{GREEN}Done!{RESET} Saved to {DOWNLOAD_DIR}/")
+    else:
+        die("Download failed. Check the URL and try again.")
+
+
+def main():
+    signal.signal(signal.SIGINT, lambda *_: (print(f"\n{YELLOW}Cancelled.{RESET}"), sys.exit(0)))
+
+    check_deps()
+
+    print(f"""
+{BOLD}{CYAN}  fastdl{RESET} - terminal fast downloader
+{DIM}  Videos, audio, files - any link{RESET}
+""")
+
+    if len(sys.argv) > 1 and sys.argv[1] in ("-h", "--help"):
+        print(f"  {BOLD}Usage:{RESET} fastdl [URL]       download from terminal")
+        print(f"         fastdl web          launch web UI")
+        print(f"  Paste any link - videos, audio, images, files.")
+        print(f"  For video links, you'll get resolution options.")
+        print(f"  Downloads save to ~/Downloads/")
+        sys.exit(0)
+
+    if len(sys.argv) > 1 and sys.argv[1] == "web":
+        server = os.path.join(os.path.dirname(os.path.abspath(__file__)), "server.py")
+        os.execvp(sys.executable, [sys.executable, server])
+        sys.exit(0)
+
+    if len(sys.argv) > 1:
+        url = sys.argv[1]
+    else:
+        url = input(f"{BOLD}Paste URL:{RESET} ").strip()
+
+    if not url:
+        die("No URL provided.")
+
+    if not re.match(r"https?://", url):
+        url = "https://" + url
+
+    # Direct file download
+    if is_direct_file(url):
+        download_direct(url)
+        return
+
+    # Try as media (video/audio)
+    info = probe_formats(url)
+    if info:
+        mode, height = pick_resolution(info)
+        audio_fmt, audio_quality = ("mp3", "0")
+        if mode == "audio":
+            audio_fmt, audio_quality = pick_audio_options()
+        download_media(url, mode, height, audio_fmt, audio_quality)
+    else:
+        # Fallback: try direct download
+        print(f"{YELLOW}Not a recognized media link. Trying direct download...{RESET}")
+        download_direct(url)
+
+
+if __name__ == "__main__":
+    main()
